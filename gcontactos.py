@@ -1,16 +1,11 @@
-# ************************************************
-#  (c) 2019-2021 Nurul-GC                        *
-# ************************************************
-
 from os import makedirs, path
-from PyQt5.Qt import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-import notify2 as notify
 from sys import argv
+import sqlite3
+
+from PyQt5.Qt import *
 
 
-class L4C8:
+class GContactos:
     def __init__(self):
         self.gc = QApplication(argv)
         self.ferramentas = QWidget()
@@ -53,34 +48,7 @@ class L4C8:
         layout = QFormLayout()
         layout.setSpacing(15)
 
-        labelIntro = QLabel("<h2>'Nunca Confundas Talento Com Sorte!'<br> - GC</h2>")
-        labelIntro.setAlignment(Qt.AlignCenter)
-        labelIntro.setFont(QFont('cambria', italic=True))
-        layout.addWidget(labelIntro)
-
-        self.nome = QLineEdit()
-        self.nome.setToolTip('OBRIGATÓRIO!')
-        layout.addRow('&Nome: *', self.nome)
-
-        self.numero = QLineEdit()
-        self.numero.setToolTip('OBRIGATÓRIO!')
-        layout.addRow('&Numero: *', self.numero)
-
-        layoutEndereco = QVBoxLayout()
-        self.endereco1 = QLineEdit()
-        self.endereco2 = QLineEdit()
-        layoutEndereco.addWidget(self.endereco1)
-        layoutEndereco.addWidget(self.endereco2)
-        layout.addRow('Endereço:', layoutEndereco)
-
-        self.email = QLineEdit()
-        layout.addRow('Email:', self.email)
-
-        janela1.setLayout(layout)
-        self.tab.addTab(janela1, 'Principal')
-        self.tab.setCurrentWidget(janela1)
-
-    def guardar_(self):
+    def _guardar(self):
         self.tab.removeTab(0)
         self.principal()
         self.nome.clear()
@@ -92,52 +60,51 @@ class L4C8:
     def guardar(self):
         if (self.nome and self.numero) is None:
             QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Nome e Número Não Preenchidos..')
-        elif (self.nome.text() and self.numero.text()) is '':
+        elif (self.nome.text() and self.numero.text()) == '':
             QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Nome e Número Não Preenchidos..')
         else:
-            if not path.exists('GContactos'):
-                makedirs('GContactos')
-            with open(f"GContactos/{self.nome.text()}.gcontact", 'w+') as file:
-                if self.endereco1.text() == '' and self.endereco2.text() == '' and self.email.text() == '':
-                    file.write(f'''Nome: {self.nome.get()}
-Numero: {self.numero.get()}''')
-                else:
-                    file.write(f'''Nome: {self.nome.get()}
-Numero: {self.numero.get()}
-Morada: {self.morada1.get()}, {self.morada2.get()}
-Email: {self.email.get()}''')
-            self.guardar_()
-            showinfo('Confirmação', 'Contacto Guardado\n 👌 👍')
+            if not path.exists('Contactos'):
+                makedirs('Contactos')
 
-    def editar_(self):
+    #
+    def _editar(self):
         if self.janela2 is None:
             return self.editar()
         try:
             self.tab.removeTab(1)
             return self.editar()
-        except TclError:
+        except Exception:
             return self.editar()
 
     def editar(self):
         pass
 
-    def ler(self):
-        pass
-
     def sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
-Nome: ListaContactos GC
-Versão: 0.6-012021
+Nome: GContactos
+Versão: 0.7-082021
 Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
 
 
+class GCdb:
+    """classe para gerir as operacoes com a db"""
+    def criarDb(self):
+        makedirs('Contactos', exist_ok=True)
+        try:
+            db = sqlite3.connect('Contactos/gc.db')
+            executor = db.cursor()
+        except Exception as erro:
+            print(f'[X]-{erro}')
+
+    def redefinirDb(self):
+        pass
+
+    def guardarNovosDados(self, _nome, _numero, _email, _morada):
+        pass
+
+
 if __name__ == '__main__':
-    try:
-        app = L4C8()
-        app.ferramentas.show()
-        app.gc.exec_()
-    except Exception as erro:
-        notify.init(app_name='lista_contactos_gc')
-        notificao = notify.Notification(summary='Falha', message=f'Ocorreu um erro ao iniciar a aplicação..')
-        notificao.show()
+    app = GContactos()
+    app.ferramentas.show()
+    app.gc.exec_()
