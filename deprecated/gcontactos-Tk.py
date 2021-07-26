@@ -13,7 +13,7 @@ from tk_tools import ToolTip
 from os import makedirs, path
 from tkinter.filedialog import *
 from tkinter.messagebox import *
-from tkinter.scrolledlist import ScrolledList
+# from tkinter.scrolledlist import ScrolledList
 from tkinter.scrolledtext import ScrolledText
 
 
