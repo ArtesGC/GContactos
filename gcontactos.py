@@ -87,32 +87,6 @@ Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
 
 
-class GCdb:
-    """classe para gerir as operacoes com a db"""
-
-    def criarDb(self):
-        makedirs('Contactos', exist_ok=True)
-        try:
-            db = sqlite3.connect('Contactos/gc.db')
-            executor = db.cursor()
-            executor.execute("CREATE TABLE IF NOT EXISTS gcontactos" 
-                             "(id integer primary key autoincrement," 
-                             " nome varchar(80) not null," 
-                             " numero varchar(20) not null," 
-                             " email varchar(50) not null," 
-                             " morada varchar() not null," 
-                             " estado varchar(10) not null);")
-        except Exception as erro:
-            print(f'[X]-{erro}')
-
-    def redefinirDb(self):
-        # nuruldecarvalho@gmail.com
-        pass
-
-    def guardarNovosDados(self, _nome, _numero, _email, _morada):
-        pass
-
-
 if __name__ == '__main__':
     app = GContactos()
     app.ferramentas.show()
