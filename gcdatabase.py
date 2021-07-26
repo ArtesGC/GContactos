@@ -1,3 +1,6 @@
+import sqlite3
+
+
 class GCdb:
     """classe para gerir as operacoes com a db"""
 
@@ -17,8 +20,15 @@ class GCdb:
             print(f'[X]-{erro}')
 
     def apagarDados(self, _id):
-        # nuruldecarvalho@gmail.com
         pass
 
     def adicionarDados(self, _nome, _numero, _email, _morada):
-        pass
+        executor = self.criarDb()
+        try:
+            result = executor.execute()
+            if result:
+                executor.close()
+                return True
+        except Exception:
+            executor.close()
+            return False
