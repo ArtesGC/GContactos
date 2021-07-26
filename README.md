@@ -1,12 +1,12 @@
 ﻿<div align="center">
 
-# OLÁ APRESENTO TE..
+# HELLO I INTRODUCE TO YOU..
 
 ![favicon-gcontactos](img/favicon-512x512.png)
 
 ```txt
-um script-programa que te permite GUARDAR LER e EDITAR
-informações de contactos de qualquer fonte e pessoa
+A script-program that allows you to SAVE, READ and EDIT
+contact informations from any person around the world..
 ```
 
 </div>
