@@ -1,11 +1,13 @@
-﻿# OLÁ APRESENTO TE..
+﻿<div align="center">
 
-<div align="center">
+# OLÁ APRESENTO TE..
 
 ![favicon-gcontactos](img/favicon-512x512.png)
 
-    um script-programa que te permite GUARDAR LER e EDITAR
-    informações de contactos de qualquer fonte e pessoa
+```txt
+um script-programa que te permite GUARDAR LER e EDITAR
+informações de contactos de qualquer fonte e pessoa
+```
 
 </div>
 
