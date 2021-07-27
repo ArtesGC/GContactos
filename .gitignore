@@ -263,3 +263,5 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### User template
+Contactos/*.db
