@@ -34,11 +34,12 @@ class GCdb:
             if resultado:
                 db.commit()
                 db.close()
+                return True
         except Exception as erro:
             print(erro)
+            return False
         if not db:
             raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
-        return True
 
     def adicionarDados(self, _nome, _numero, _email, _morada):
         db = self.conectarDb()
@@ -54,3 +55,20 @@ class GCdb:
         if not db:
             raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
         return True
+
+    def atualizarDados(self, _id, _nome, _numero, _email, _morada):
+        db = self.conectarDb()
+        try:
+            executor = db.cursor()
+            resultado = executor.execute("UPDATE gcontactos "
+                                         "SET nome=?, numero=?, email=?, morada=?"
+                                         "WHERE id=?", (_nome, _numero, _email, _morada, _id))
+            if resultado:
+                db.commit()
+                db.close()
+                return True
+        except Exception as erro:
+            print(erro)
+            return False
+        if not db:
+            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
