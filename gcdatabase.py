@@ -1,11 +1,13 @@
 import sqlite3
+from os import makedirs
 
 
 class GCdb:
     """classe para gerir as operacoes com a db"""
 
-    def criarDb(self):
+    def conectarDb(self):
         makedirs('Contactos', exist_ok=True)
+        db = None
         try:
             db = sqlite3.connect('Contactos/gc.db')
             executor = db.cursor()
@@ -15,22 +17,40 @@ class GCdb:
                                          " numero varchar(20) not null,"
                                          " email varchar(50) not null,"
                                          " morada varchar(120) not null);")
-            return executor
-        except Exception as erro:
-            print(f'[X]-{erro}')
+            if resultado:
+                db.commit()
+        except Exception:
+            db = False
+        return db
 
-    def apagarDados(self, _id):
-        pass
+    def apagarDado(self, _id=None):
+        db = self.conectarDb()
+        try:
+            executor = db.cursor()
+            if not _id:
+                resultado = executor.execute("DELETE FROM gcontactos")
+            else:
+                resultado = executor.execute("DELETE FROM gcontactos WHERE id=?", (id,))
+            if resultado:
+                db.commit()
+                db.close()
+        except Exception as erro:
+            print(erro)
+        if not db:
+            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
+        return True
 
     def adicionarDados(self, _nome, _numero, _email, _morada):
-        executor = self.criarDb()
+        db = self.conectarDb()
         try:
-            result = executor.execute(f'INSERT INTO gcontactos '
-                                      f'(nome, numero, email, morada) '
-                                      f'VALUES("{_nome}","{_numero}","{_email}","{_morada}");')
-            if result:
-                executor.close()
-                return True
-        except Exception:
-            executor.close()
-            return False
+            executor = db.cursor()
+            resultado = executor.execute('INSERT INTO gcontactos (nome, numero, email, morada) VALUES(?, ?, ?, ?);',
+                                         (_nome, _numero, _email, _morada))
+            if resultado:
+                db.commit()
+                db.close()
+        except Exception as erro:
+            print(erro)
+        if not db:
+            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
+        return True
