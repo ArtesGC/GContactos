@@ -1,8 +1,9 @@
 from os import makedirs, path
-from sys import argv
+from sys import argv, exit
 import sqlite3
 
 from PyQt5.Qt import *
+from gcdatabase import GCdb
 
 
 class GContactos:
@@ -18,18 +19,14 @@ class GContactos:
         detalhes = menu.addMenu('Opções')
         # ------------------------------
         ler = detalhes.addAction('Ler Contacto')
-        ler.triggered.connect(self.ler)
+        ler.triggered.connect(self._ler)
         # ------------------------------
-        editar = detalhes.addAction('Editar Contacto')
-        editar.triggered.connect(self.editar)
-        detalhes.addSeparator()
-        # ------------------------------
-        _sair_ = lambda: self.gc.instance().exit(0)
+        _sair = lambda: exit(0)
         sair = detalhes.addAction('Sair')
-        sair.triggered.connect(_sair_)
+        sair.triggered.connect(_sair)
         # ------------------------------
         sobre = menu.addAction('Sobre')
-        sobre.triggered.connect(self.sobre)
+        sobre.triggered.connect(self._sobre)
 
         self.tab = QTabWidget(self.ferramentas)
         self.tab.setFixedSize(550, 480)
@@ -48,6 +45,32 @@ class GContactos:
         layout = QFormLayout()
         layout.setSpacing(15)
 
+        btnProcurar = QLineEdit()
+        btnProcurar.setPlaceholderText('Digite o nome ou numero do contacto..')
+        layout.addRow(btnProcurar)
+
+        conectDb = QSqlDatabase.addDatabase('QSQLITE')
+        conectDb.setDatabaseName('Contactos/gc.db')
+
+        modelDb = QSqlTableModel()
+        modelDb.setTable('gcontactos')
+        modelDb.setHeaderData(0, Qt.Horizontal, 'Nome')
+        modelDb.setHeaderData(1, Qt.Horizontal, 'Numero')
+        modelDb.setHeaderData(2, Qt.Horizontal, 'Email')
+        modelDb.setHeaderData(3, Qt.Horizontal, 'Morada')
+
+        tabelaContactos = QTableView()
+        tabelaContactos.setModel(modelDb)
+        tabelaContactos.setAlternatingRowColors(True)
+        tabelaContactos.setSortingEnabled(True)
+        tabelaContactos.resizeColumnsToContents()
+        tabelaContactos.clicked.connect(self._editar)
+        layout.addRow(tabelaContactos)
+
+        janela1.setLayout(layout)
+        self.tab.addTab(janela1, 'Principal')
+        self.tab.setCurrentIndex(self.tab.currentIndex())
+
     def _guardar(self):
         self.tab.removeTab(0)
         self.principal()
@@ -63,23 +86,19 @@ class GContactos:
         elif (self.nome.text() and self.numero.text()) == '':
             QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Nome e Número Não Preenchidos..')
         else:
-            if not path.exists('Contactos'):
-                makedirs('Contactos')
+            pass
 
     #
     def _editar(self):
-        if self.janela2 is None:
-            return self.editar()
-        try:
-            self.tab.removeTab(1)
-            return self.editar()
-        except Exception:
-            return self.editar()
+        pass
 
     def editar(self):
         pass
 
-    def sobre(self):
+    def _ler(self):
+        pass
+
+    def _sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
 Nome: GContactos
 Versão: 0.7-082021
@@ -88,6 +107,7 @@ Empresa: ArtesGC Inc.""")
 
 
 if __name__ == '__main__':
+    GCdb().conectarDb()
     app = GContactos()
     app.ferramentas.show()
     app.gc.exec_()
