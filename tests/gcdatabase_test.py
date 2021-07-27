@@ -4,10 +4,10 @@ from gcdatabase import GCdb
 
 class MyTestCase(unittest.TestCase):
     def test_criacaoDb(self):
-        self.assertTrue(GCdb().criarDb())
+        self.assertTrue(GCdb().conectarDb())
 
     def test_apagardados(self):
-        self.assertTrue(GCdb().apagarDados(_id=1))
+        self.assertTrue(GCdb().apagarDado(_id=0))
 
     def test_adicionardados(self):
         self.assertTrue(GCdb().adicionarDados(_nome='gc', _numero='12345',
