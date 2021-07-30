@@ -2,7 +2,7 @@
 
 # HELLO I INTRODUCE TO YOU..
 
-![favicon-gcontactos](img/favicon-512x512.png)
+![favicon-gcontactos](img/favicons/favicon-512x512.png)
 
 ```txt
 A script-program that allows you to SAVE, READ and EDIT
