@@ -1,4 +1,4 @@
 QWidgets, QMainWindow, QDialog{
-  background-color: black;
+  background-color: antiquewhite;
   color: #EDB;
 }
