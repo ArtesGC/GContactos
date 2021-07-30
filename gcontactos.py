@@ -1,9 +1,10 @@
-from os import makedirs, path
 from sys import argv, exit
-import sqlite3
 
 from PyQt5.Qt import *
+
 from gcdatabase import GCdb
+
+theme = open('themes/gcontactos.qss').read().strip()
 
 
 class GContactos:
@@ -12,25 +13,20 @@ class GContactos:
         self.ferramentas = QWidget()
         self.ferramentas.setFixedSize(550, 500)
         self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
-        self.ferramentas.setWindowTitle('Contactos GC')
-        self.ferramentas.setPalette(QPalette(QColor('antiquewhite')))
+        self.ferramentas.setWindowTitle('GContactos')
+        self.ferramentas.setStyleSheet(theme)
 
-        menu = QMenuBar(self.ferramentas)
-        detalhes = menu.addMenu('Opções')
-        # ------------------------------
-        ler = detalhes.addAction('Ler Contacto')
-        ler.triggered.connect(self._ler)
-        # ------------------------------
-        _sair = lambda: exit(0)
-        sair = detalhes.addAction('Sair')
-        sair.triggered.connect(_sair)
-        # ------------------------------
-        sobre = menu.addAction('Sobre')
+        menu = QToolBar(self.ferramentas)
+
+        sobre = menu.addAction(QIcon("img/icons/about.png"), 'Sobre')
         sobre.triggered.connect(self._sobre)
 
+        _sair = lambda: exit(0)
+        sair = menu.addAction(QIcon("img/icons/close.png"), 'Sair')
+        sair.triggered.connect(_sair)
+
         self.tab = QTabWidget(self.ferramentas)
-        self.tab.setFixedSize(550, 480)
-        self.tab.move(0, 25)
+        self.tab.setGeometry(0, 50, 550, 470)
 
         self.nome = None
         self.numero = None
@@ -44,10 +40,6 @@ class GContactos:
         janela1 = QWidget()
         layout = QFormLayout()
         layout.setSpacing(15)
-
-        btnProcurar = QLineEdit()
-        btnProcurar.setPlaceholderText('Digite o nome ou numero do contacto..')
-        layout.addRow(btnProcurar)
 
         conectDb = QSqlDatabase.addDatabase('QSQLITE')
         conectDb.setDatabaseName('Contactos/gc.db')
