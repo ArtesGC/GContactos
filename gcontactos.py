@@ -18,18 +18,15 @@ class GContactos:
 
         menu = QToolBar(self.ferramentas)
 
-        opcoes = QMenu("Opcoes")
-        menu.addWidget(opcoes)
-
         _sair = lambda: exit(0)
-        sair = menu.addAction(QIcon("img/icons/close.png"), 'Sair')
+        sair = menu.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
         sair.triggered.connect(_sair)
 
         sobre = menu.addAction(QIcon("img/icons/about.png"), 'Sobre')
         sobre.triggered.connect(self._sobre)
 
         self.tab = QTabWidget(self.ferramentas)
-        self.tab.setGeometry(0, 50, 600, 570)
+        self.tab.setGeometry(0, 40, 600, 570)
 
         self.nome = None
         self.numero = None
@@ -40,6 +37,15 @@ class GContactos:
         self.principal()
 
     def principal(self):
+        def initModel(_modelDb):
+            _modelDb.setTable('gcontactos')
+            _modelDb.setHeaderData(0, Qt.Horizontal, 'Id')
+            _modelDb.setHeaderData(1, Qt.Horizontal, 'Nome')
+            _modelDb.setHeaderData(2, Qt.Horizontal, 'Numero')
+            _modelDb.setHeaderData(3, Qt.Horizontal, 'Email')
+            _modelDb.setHeaderData(4, Qt.Horizontal, 'Morada')
+            _modelDb.select()
+
         janela1 = QWidget()
         layout = QFormLayout()
         layout.setSpacing(15)
@@ -48,18 +54,13 @@ class GContactos:
         conectDb.setDatabaseName('Contactos/gc.db')
 
         modelDb = QSqlTableModel()
-        modelDb.setTable('gcontactos')
-        modelDb.setHeaderData(0, Qt.Horizontal, 'Nome')
-        modelDb.setHeaderData(1, Qt.Horizontal, 'Numero')
-        modelDb.setHeaderData(2, Qt.Horizontal, 'Email')
-        modelDb.setHeaderData(3, Qt.Horizontal, 'Morada')
+        initModel(modelDb)
 
         tabelaContactos = QTableView()
         tabelaContactos.setModel(modelDb)
         tabelaContactos.setAlternatingRowColors(True)
         tabelaContactos.setSortingEnabled(True)
         tabelaContactos.resizeColumnsToContents()
-        tabelaContactos.clicked.connect(self._editar)
         layout.addRow(tabelaContactos)
 
         janela1.setLayout(layout)
