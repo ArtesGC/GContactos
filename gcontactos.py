@@ -11,22 +11,25 @@ class GContactos:
     def __init__(self):
         self.gc = QApplication(argv)
         self.ferramentas = QWidget()
-        self.ferramentas.setFixedSize(550, 500)
+        self.ferramentas.setFixedSize(600, 600)
         self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
         self.ferramentas.setWindowTitle('GContactos')
         self.ferramentas.setStyleSheet(theme)
 
         menu = QToolBar(self.ferramentas)
 
-        sobre = menu.addAction(QIcon("img/icons/about.png"), 'Sobre')
-        sobre.triggered.connect(self._sobre)
+        opcoes = QMenu("Opcoes")
+        menu.addWidget(opcoes)
 
         _sair = lambda: exit(0)
         sair = menu.addAction(QIcon("img/icons/close.png"), 'Sair')
         sair.triggered.connect(_sair)
 
+        sobre = menu.addAction(QIcon("img/icons/about.png"), 'Sobre')
+        sobre.triggered.connect(self._sobre)
+
         self.tab = QTabWidget(self.ferramentas)
-        self.tab.setGeometry(0, 50, 550, 470)
+        self.tab.setGeometry(0, 50, 600, 570)
 
         self.nome = None
         self.numero = None
