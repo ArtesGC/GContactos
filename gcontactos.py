@@ -84,7 +84,6 @@ class GContactos:
         else:
             pass
 
-    #
     def _editar(self):
         pass
 
@@ -93,6 +92,26 @@ class GContactos:
 
     def _ler(self):
         pass
+
+    def _novo(self):
+        pass
+
+    def novo(self):
+        janela = QFrame()
+        layout = QFormLayout()
+        layout.setVerticalSpacing(10)
+
+        self.nome = QLineEdit()
+        self.nome.setPlaceholderText('Digite aqui o nome..')
+        layout.addRow(self.nome)
+
+        self.email = QLineEdit()
+        self.email.setPlaceholderText('Digite aqui o email..')
+        layout.addRow(self.email)
+
+        self.numero = QLineEdit()
+        self.numero.setPlaceholderText('Digite aqui o numero..')
+        layout.addRow(self.numero)
 
     def _sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
