@@ -3,6 +3,7 @@ from sys import argv, exit
 from PyQt5.Qt import *
 
 from gcdatabase import GCdb
+from gcindicativos import GCI
 
 theme = open('themes/gcontactos.qss').read().strip()
 
@@ -17,6 +18,9 @@ class GContactos:
         self.ferramentas.setStyleSheet(theme)
 
         menu = QToolBar(self.ferramentas)
+
+        novo = menu.addAction(QIcon('img/icons/newcontact.png'), 'Novo Contacto')
+        novo.triggered.connect(self.novo)
 
         _sair = lambda: exit(0)
         sair = menu.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
@@ -97,9 +101,17 @@ class GContactos:
         pass
 
     def novo(self):
+        def atualizarNumero():
+            indicativo = GCI().indicativo_especifico(comboPaises.currentText())
+            self.numero.setPlaceholderText(f'+{indicativo}-..')
+
         janela = QFrame()
         layout = QFormLayout()
-        layout.setVerticalSpacing(10)
+        layout.setSpacing(20)
+
+        iconLabel = QLabel()
+        iconLabel.setPixmap(QPixmap('img/icons/user.png'))
+        layout.addRow(iconLabel)
 
         self.nome = QLineEdit()
         self.nome.setPlaceholderText('Digite aqui o nome..')
@@ -109,9 +121,18 @@ class GContactos:
         self.email.setPlaceholderText('Digite aqui o email..')
         layout.addRow(self.email)
 
+        paises = GCI().paises()
+        comboPaises = QComboBox()
+        comboPaises.addItems(paises)
+        comboPaises.currentTextChanged.connect(atualizarNumero)
+
         self.numero = QLineEdit()
-        self.numero.setPlaceholderText('Digite aqui o numero..')
-        layout.addRow(self.numero)
+        self.numero.setPlaceholderText(f'+{GCI().indicativo_especifico(comboPaises.currentText())}-..')
+        layout.addRow(comboPaises, self.numero)
+
+        janela.setLayout(layout)
+        self.tab.addTab(janela, 'Novo Contacto')
+        self.tab.setCurrentWidget(janela)
 
     def _sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
