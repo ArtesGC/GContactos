@@ -244,10 +244,17 @@ class GCI:
         }
 
     def paises(self):
-        return self.dados_globais.keys()
+        paises = []
+        for pais in self.dados_globais:
+            paises.append(pais)
+        return paises
 
     def indicativos(self):
-        return self.dados_globais.values()
+        indicativos = []
+        for pais in self.paises():
+            indicativo = self.dados_globais[pais]
+            indicativos.append(indicativo)
+        return indicativos
 
     def indicativo_especifico(self, _pais: str):
         try:
@@ -255,3 +262,9 @@ class GCI:
         except KeyError:
             return f'nao foi encontrado nenhum pais com nome de "{_pais}", ' \
                    f'certifique-se que escreveu corretamente o nome!'
+
+
+if __name__ == '__main__':
+    _paises = GCI().paises()
+    _indicativos = GCI().indicativos()
+    print(_paises, _indicativos)
