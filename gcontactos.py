@@ -103,10 +103,10 @@ class GContactos:
 
         visualizador = QLabel()
         visualizador.setText(f"""
-<b>Nome</b>: {}
-<b>Numero</b>: {}
-<b>Email</b>: {}
-<b>Morada</b>: {}
+<b>Nome</b>: {contacto[0]}
+<b>Numero</b>: {contacto[1]}
+<b>Email</b>: {contacto[2]}
+<b>Morada</b>: {contacto[3]}
 """)
 
     def _novo(self):
