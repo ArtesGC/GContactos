@@ -10,6 +10,12 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(GCdb().adicionarDados(_nome='gc', _numero='12345',
                                               _morada='sa', _email='nurul@gmail.com'))
 
+    def test_visualizardados(self):
+        dados = GCdb().retornarDados(_nome='nurul')
+        if dados:
+            return True
+        return False
+
     def test_atualizardados(self):
         self.assertTrue(GCdb().atualizarDados(_nome='nurul', _numero='54321',
                                               _morada='ao', _email='gc@gmail.com', _id=0))
