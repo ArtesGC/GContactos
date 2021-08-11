@@ -15,8 +15,8 @@ class GCdb:
                                          "(id integer primary key autoincrement,"
                                          " nome varchar(80) not null,"
                                          " numero varchar(20) not null,"
-                                         " email varchar(50) not null,"
-                                         " morada varchar(120) not null);")
+                                         " email varchar(50),"
+                                         " morada varchar(120));")
             if resultado:
                 db.commit()
         except Exception:
@@ -39,7 +39,7 @@ class GCdb:
             print(erro)
             return False
         if not db:
-            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
+            raise ConnectionError(f'Erro ao conectar db!\nconnection_result:{db}')
 
     def adicionarDados(self, _nome, _numero, _email, _morada):
         db = self.conectarDb()
@@ -53,7 +53,7 @@ class GCdb:
         except Exception as erro:
             print(erro)
         if not db:
-            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
+            raise ConnectionError(f'Erro ao conectar db!\nconnection_result:{db}')
         return True
 
     def atualizarDados(self, _id, _nome, _numero, _email, _morada):
@@ -71,13 +71,13 @@ class GCdb:
             print(erro)
             return False
         if not db:
-            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
+            raise ConnectionError(f'Erro ao conectar db!\nconnection_result:{db}')
 
     def retornarDados(self, _nome):
         db = self.conectarDb()
         try:
             executor = db.cursor()
-            resultado = executor.execute("SELECT FROM gcontactos WHERE nome=?", (_nome,))
+            resultado = executor.execute("SELECT * FROM gcontactos WHERE nome=?", (_nome,))
             if resultado:
                 dados = executor.fetchall()
                 return dados
@@ -85,4 +85,4 @@ class GCdb:
             print(erro)
             return False
         if not db:
-            raise ConnectionError(f'Erro ao conectar db!\nconection_result:{db}')
+            raise ConnectionError(f'Erro ao conectar db!\nconnection_result:{db}')
