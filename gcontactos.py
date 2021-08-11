@@ -1,3 +1,4 @@
+import re
 from sys import argv, exit
 
 from PyQt5.Qt import *
@@ -19,12 +20,12 @@ class GContactos:
 
         menu = QToolBar(self.ferramentas)
 
-        novo = menu.addAction(QIcon('img/icons/newcontact.png'), 'Novo Contacto')
-        novo.triggered.connect(self.novo)
-
         _sair = lambda: exit(0)
         sair = menu.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
         sair.triggered.connect(_sair)
+
+        novo = menu.addAction(QIcon('img/icons/newcontact.png'), 'Novo Contacto')
+        novo.triggered.connect(self._novo)
 
         sobre = menu.addAction(QIcon("img/icons/about.png"), 'Sobre')
         sobre.triggered.connect(self._sobre)
@@ -34,9 +35,12 @@ class GContactos:
 
         self.nome = None
         self.numero = None
-        self.endereco1 = None
-        self.endereco2 = None
+        self.endereco = None
         self.email = None
+        self.indicativo = None
+        self.janelaNovoContacto = None
+        self.janelaEditarContacto = None
+        self.janelaLerContacto = None
 
         self.principal()
 
@@ -71,50 +75,88 @@ class GContactos:
         self.tab.addTab(janela1, 'Principal')
         self.tab.setCurrentIndex(self.tab.currentIndex())
 
-    def _guardar(self):
-        self.tab.removeTab(0)
-        self.principal()
-        self.nome.clear()
-        self.numero.clear()
-        self.endereco1.clear()
-        self.endereco2.clear()
-        self.email.clear()
-
-    def guardar(self):
-        if (self.nome and self.numero) is None:
-            QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Nome e Número Não Preenchidos..')
-        elif (self.nome.text() and self.numero.text()) == '':
-            QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Nome e Número Não Preenchidos..')
-        else:
-            pass
-
     def _editar(self):
-        pass
+        if not self.janelaEditarContacto:
+            return self.editar()
+        else:
+            return self.tab.setCurrentWidget(self.janelaEditarContacto)
 
     def editar(self):
         pass
 
     def _ler(self):
-        pass
+        if not self.janelaLerContacto:
+            return self.editar()
+        else:
+            return self.tab.setCurrentWidget(self.janelaLerContacto)
+
+    def ler(self, _nome=None):
+        self.janelaLerContacto = QFrame()
+        layout = QFormLayout()
+        layout.setSpacing(20)
+
+        nome = QLineEdit()
+        nome.setPlaceholderText('Digite o nome do contacto que deseja visualizar..')
+        layout.addRow(nome)
+
+        contacto = GCdb().retornarDados(nome.text())
+
+        visualizador = QLabel()
+        visualizador.setText(f"""
+<b>Nome</b>: {}
+<b>Numero</b>: {}
+<b>Email</b>: {}
+<b>Morada</b>: {}
+""")
 
     def _novo(self):
-        pass
+        if not self.janelaNovoContacto:
+            return self.novo()
+        else:
+            self.tab.setCurrentWidget(self.janelaNovoContacto)
 
     def novo(self):
-        def atualizarNumero():
-            indicativo = GCI().indicativo_especifico(comboPaises.currentText())
-            self.numero.setPlaceholderText(f'+{indicativo}-..')
+        def atualizarIndicativo():
+            self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
+            self.numero.setPlaceholderText(f'+{self.indicativo}-..')
 
-        janela = QFrame()
+        def validarEmail(_email):
+            validador = re.compile(r'^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}')
+            if validador.match(_email):
+                return True
+            return False
+
+        def salvar():
+            if (self.nome.text() or self.numero.text()) == '':
+                QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Dados Obrigatórios Não Preenchidos..')
+            elif not validarEmail(self.email.text()):
+                QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Endereço de Email inválido..')
+            else:
+                QMessageBox.information(self.ferramentas, 'Concluido', 'Contacto Salvo com Sucesso..')
+                nome = self.nome.text()
+                email = self.email.text()
+                numero = self.numero.text()
+                morada = self.endereco.text()
+                try:
+                    GCdb().adicionarDados(nome, numero, email, morada)
+                except Exception as erro:
+                    QMessageBox.critical(self.ferramentas, 'Falha', f'Ocorreu o Seguinte Erro Enquanto Processava a Operação: '
+                                                                    f'\n- {erro}')
+                finally:
+                    self.tab.removeTab(self.tab.currentIndex())
+
+        self.janelaNovoContacto = QFrame()
         layout = QFormLayout()
         layout.setSpacing(20)
 
         iconLabel = QLabel()
         iconLabel.setPixmap(QPixmap('img/icons/user.png'))
+        iconLabel.setAlignment(Qt.AlignRight)
         layout.addRow(iconLabel)
 
         self.nome = QLineEdit()
         self.nome.setPlaceholderText('Digite aqui o nome..')
+        self.nome.setToolTip('Obrigatório')
         layout.addRow(self.nome)
 
         self.email = QLineEdit()
@@ -124,15 +166,26 @@ class GContactos:
         paises = GCI().paises()
         comboPaises = QComboBox()
         comboPaises.addItems(paises)
-        comboPaises.currentTextChanged.connect(atualizarNumero)
+        self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
+        comboPaises.currentTextChanged.connect(atualizarIndicativo)
 
         self.numero = QLineEdit()
-        self.numero.setPlaceholderText(f'+{GCI().indicativo_especifico(comboPaises.currentText())}-..')
+        self.numero.setPlaceholderText(f'+{self.indicativo}..')
+        self.numero.setToolTip('Obrigatório')
         layout.addRow(comboPaises, self.numero)
 
-        janela.setLayout(layout)
-        self.tab.addTab(janela, 'Novo Contacto')
-        self.tab.setCurrentWidget(janela)
+        self.endereco = QLineEdit()
+        self.endereco.setPlaceholderText('Digite aqui a morada..')
+        self.endereco.setMaxLength(119)
+        layout.addRow(self.endereco)
+
+        btnSalvar = QPushButton('Salvar')
+        btnSalvar.clicked.connect(salvar)
+        layout.addWidget(btnSalvar)
+
+        self.janelaNovoContacto.setLayout(layout)
+        self.tab.addTab(self.janelaNovoContacto, 'Novo Contacto')
+        self.tab.setCurrentWidget(self.janelaNovoContacto)
 
     def _sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
