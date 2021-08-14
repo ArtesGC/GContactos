@@ -45,31 +45,9 @@ class GContactos:
         self.principal()
 
     def principal(self):
-        def initModel(_modelDb):
-            _modelDb.setTable('gcontactos')
-            _modelDb.setHeaderData(0, Qt.Horizontal, 'Id')
-            _modelDb.setHeaderData(1, Qt.Horizontal, 'Nome')
-            _modelDb.setHeaderData(2, Qt.Horizontal, 'Numero')
-            _modelDb.setHeaderData(3, Qt.Horizontal, 'Email')
-            _modelDb.setHeaderData(4, Qt.Horizontal, 'Morada')
-            _modelDb.select()
-
         janela1 = QWidget()
         layout = QFormLayout()
         layout.setSpacing(15)
-
-        conectDb = QSqlDatabase.addDatabase('QSQLITE')
-        conectDb.setDatabaseName('Contactos/gc.db')
-
-        modelDb = QSqlTableModel()
-        initModel(modelDb)
-
-        tabelaContactos = QTableView()
-        tabelaContactos.setModel(modelDb)
-        tabelaContactos.setAlternatingRowColors(True)
-        tabelaContactos.setSortingEnabled(True)
-        tabelaContactos.resizeColumnsToContents()
-        layout.addRow(tabelaContactos)
 
         janela1.setLayout(layout)
         self.tab.addTab(janela1, 'Principal')
@@ -86,28 +64,25 @@ class GContactos:
 
     def _ler(self):
         if not self.janelaLerContacto:
-            return self.editar()
+            return self.ler()
         else:
             return self.tab.setCurrentWidget(self.janelaLerContacto)
 
-    def ler(self, _nome=None):
-        self.janelaLerContacto = QFrame()
-        layout = QFormLayout()
-        layout.setSpacing(20)
+    def ler(self):
+        for contacto in GCdb().retornarDados()[0]:
+            pass
 
-        nome = QLineEdit()
-        nome.setPlaceholderText('Digite o nome do contacto que deseja visualizar..')
-        layout.addRow(nome)
-
-        contacto = GCdb().retornarDados(nome.text())
-
+    def labelContacto(self, _layout, _contacto):
+        layout = QVBoxLayout()
         visualizador = QLabel()
-        visualizador.setText(f"""
-<b>Nome</b>: {contacto[0]}
-<b>Numero</b>: {contacto[1]}
-<b>Email</b>: {contacto[2]}
-<b>Morada</b>: {contacto[3]}
-""")
+        visualizador.setText(f"<b>Nome</b>: {_contacto[1]}<br>"
+                             f"<b>Numero</b>: {_contacto[2]}<br>"
+                             f"<b>Email</b>: {_contacto[3]}<br>"
+                             f"<b>Morada</b>: {_contacto[4]}")
+
+        prwBtn = QPushButton('')
+        fecharBtn = QPushButton('')
+        _layout.addRow(layout)
 
     def _novo(self):
         if not self.janelaNovoContacto:
@@ -118,7 +93,7 @@ class GContactos:
     def novo(self):
         def atualizarIndicativo():
             self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
-            self.numero.setPlaceholderText(f'+{self.indicativo}-..')
+            self.numero.setPlaceholderText(f'+{self.indicativo}..')
 
         def validarEmail(_email):
             validador = re.compile(r'^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}')
@@ -132,18 +107,17 @@ class GContactos:
             elif not validarEmail(self.email.text()):
                 QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Endereço de Email inválido..')
             else:
-                QMessageBox.information(self.ferramentas, 'Concluido', 'Contacto Salvo com Sucesso..')
                 nome = self.nome.text()
                 email = self.email.text()
                 numero = self.numero.text()
                 morada = self.endereco.text()
                 try:
                     GCdb().adicionarDados(nome, numero, email, morada)
+                    QMessageBox.information(self.ferramentas, 'Concluido', 'Contacto Salvo com Sucesso..')
+                    self.tab.removeTab(self.tab.currentIndex())
                 except Exception as erro:
                     QMessageBox.critical(self.ferramentas, 'Falha', f'Ocorreu o Seguinte Erro Enquanto Processava a Operação: '
                                                                     f'\n- {erro}')
-                finally:
-                    self.tab.removeTab(self.tab.currentIndex())
 
         self.janelaNovoContacto = QFrame()
         layout = QFormLayout()
