@@ -73,16 +73,20 @@ class GCdb:
         if not db:
             raise ConnectionError(f'Erro ao conectar db!\nconnection_result:{db}')
 
-    def retornarDados(self, _nome):
+    def retornarDados(self, _nome=None):
+        resultado = None
         db = self.conectarDb()
         try:
             executor = db.cursor()
-            resultado = executor.execute("SELECT * FROM gcontactos WHERE nome=?", (_nome,))
-            if resultado:
-                dados = executor.fetchall()
-                return dados
+            if _nome:
+                resultado = executor.execute("SELECT * FROM gcontactos WHERE nome=?", (_nome,))
+            else:
+                resultado = executor.execute("SELECT * FROM gcontactos")
         except Exception as erro:
             print(erro)
             return False
         if not db:
             raise ConnectionError(f'Erro ao conectar db!\nconnection_result:{db}')
+        elif resultado:
+            dados = executor.fetchall()
+            return dados
