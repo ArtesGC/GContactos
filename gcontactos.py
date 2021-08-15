@@ -17,19 +17,21 @@ class GContactos:
         self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
 
         menu = QMenuBar(self.ferramentas)
-        opcoes = menu.addMenu("Opcoes")
+        opcoes = menu.addMenu("Opções")
 
         home = opcoes.addAction(QIcon("img/icons/notebook.png"), 'Contactos')
         home.triggered.connect(self._principal)
 
+        opcoes.addSeparator()
+
         novo = opcoes.addAction(QIcon('img/icons/newcontact.png'), 'Novo Contacto')
         novo.triggered.connect(self._novo)
+
+        opcoes.addSeparator()
 
         _sair = lambda: exit(0)
         sair = opcoes.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
         sair.triggered.connect(_sair)
-
-        menu.addSeparator()
 
         sobre = menu.addAction('Sobre')
         sobre.triggered.connect(self._sobre)
@@ -38,6 +40,7 @@ class GContactos:
         self.tab.setMovable(True)
         self.tab.setTabBarAutoHide(True)
         self.tab.setGeometry(0, 40, 600, 570)
+        self.tab.tabBarDoubleClicked.connect(self._fecharTab)
 
         self.nome = None
         self.email = None
@@ -48,6 +51,8 @@ class GContactos:
         self.janelaNovoContacto = None
         self.janelaEditarContacto = None
         self.janelaListaContactos = None
+
+        self.principal()
 
     def _principal(self):
         if not self.janelaListaContactos:
@@ -97,6 +102,7 @@ class GContactos:
         self.janelaLerContacto.setLayout(layout)
         self.tab.addTab(self.janelaLerContacto, 'Ler Contacto')
         self.tab.setCurrentWidget(self.janelaLerContacto)
+        self.tab.setTabToolTip(self.tab.currentIndex(), 'Dica: clique duas vezes para fechar a aba!')
 
     def labelContacto(self, _contacto):
         frame = QFrame()
@@ -230,6 +236,7 @@ class GContactos:
         self.janelaNovoContacto.setLayout(layout)
         self.tab.addTab(self.janelaNovoContacto, 'Novo Contacto')
         self.tab.setCurrentWidget(self.janelaNovoContacto)
+        self.tab.setTabToolTip(self.tab.currentIndex(), 'Dica: clique duas vezes para fechar a aba!')
 
     def _sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
@@ -237,6 +244,12 @@ Nome: GContactos
 Versão: 0.7-082021
 Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
+
+    def _fecharTab(self):
+        if self.tab.currentIndex() == 0:
+            pass
+        else:
+            self.tab.removeTab(self.tab.currentIndex())
 
 
 if __name__ == '__main__':
