@@ -1,5 +1,6 @@
 import re
 from sys import argv, exit
+from typing import Tuple
 
 from PyQt5.Qt import *
 
@@ -32,6 +33,10 @@ class GContactos:
 
         self.tab = QTabWidget(self.ferramentas)
         self.tab.setGeometry(0, 40, 600, 570)
+        self.tab.setMovable(True)
+        self.tab.setTabBarAutoHide(True)
+        self.tab.setTabsClosable(True)
+        self.tab.tabCloseRequested.connect(self._fecharTab)
 
         self.nome = None
         self.numero = None
@@ -45,13 +50,24 @@ class GContactos:
         self.principal()
 
     def principal(self):
-        janela1 = QWidget()
+        def atualizar():
+            self.tab.removeTab(self.tab.currentIndex())
+            return self.principal()
+
+        janela1 = QScrollArea()
         layout = QFormLayout()
-        layout.setSpacing(15)
+        layout.setSpacing(20)
+
+        for contacto in GCdb().retornarDados():
+            layout.addRow(self.labelContacto(contacto))
+
+        updtBtn = QPushButton('Atualizar')
+        updtBtn.clicked.connect(atualizar)
+        layout.addWidget(updtBtn)
 
         janela1.setLayout(layout)
-        self.tab.addTab(janela1, 'Principal')
-        self.tab.setCurrentIndex(self.tab.currentIndex())
+        self.tab.addTab(janela1, 'Contactos')
+        self.tab.setCurrentWidget(janela1)
 
     def _editar(self):
         if not self.janelaEditarContacto:
@@ -69,20 +85,37 @@ class GContactos:
             return self.tab.setCurrentWidget(self.janelaLerContacto)
 
     def ler(self):
-        for contacto in GCdb().retornarDados()[0]:
-            pass
-
-    def labelContacto(self, _layout, _contacto):
+        self.janelaLerContacto = QFrame()
         layout = QVBoxLayout()
+
+        self.janelaLerContacto.setLayout(layout)
+        self.tab.addTab(self.janelaLerContacto, 'Ler Contacto')
+        self.tab.setCurrentWidget(self.janelaLerContacto)
+
+    def labelContacto(self, _contacto):
+        frame = QFrame()
+        frame.setStyleSheet("border-radius: 3px;"
+                            "border-width: 2px;"
+                            "border-color: black;"
+                            "background-color: brown;"
+                            "color: white;")
+
+        layout = QFormLayout()
+        layout.setSpacing(10)
+
         visualizador = QLabel()
         visualizador.setText(f"<b>Nome</b>: {_contacto[1]}<br>"
                              f"<b>Numero</b>: {_contacto[2]}<br>"
                              f"<b>Email</b>: {_contacto[3]}<br>"
                              f"<b>Morada</b>: {_contacto[4]}")
+        layout.addRow(visualizador)
 
-        prwBtn = QPushButton('')
-        fecharBtn = QPushButton('')
-        _layout.addRow(layout)
+        edtBtn = QPushButton('Editar Contacto')
+        delBtn = QPushButton('Apagar Contacto')
+        layout.addRow(edtBtn, delBtn)
+
+        frame.setLayout(layout)
+        return frame
 
     def _novo(self):
         if not self.janelaNovoContacto:
@@ -93,7 +126,7 @@ class GContactos:
     def novo(self):
         def atualizarIndicativo():
             self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
-            self.numero.setPlaceholderText(f'+{self.indicativo}..')
+            self.numero.setText(f'+{self.indicativo}')
 
         def validarEmail(_email):
             validador = re.compile(r'^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}')
@@ -144,7 +177,7 @@ class GContactos:
         comboPaises.currentTextChanged.connect(atualizarIndicativo)
 
         self.numero = QLineEdit()
-        self.numero.setPlaceholderText(f'+{self.indicativo}..')
+        self.numero.setText(f'+{self.indicativo}')
         self.numero.setToolTip('Obrigatório')
         layout.addRow(comboPaises, self.numero)
 
@@ -167,6 +200,12 @@ Nome: GContactos
 Versão: 0.7-082021
 Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
+
+    def _fecharTab(self):
+        if self.tab.currentIndex() == 0:
+            pass
+        else:
+            self.tab.removeTab(self.tab.currentIndex())
 
 
 if __name__ == '__main__':
