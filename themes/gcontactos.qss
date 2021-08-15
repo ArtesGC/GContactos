@@ -1,4 +1,31 @@
-QWidgets, QMainWindow, QDialog{
+QWidgets, QFrame, QScrollArea{
   background-color: antiquewhite;
-  color: #EDB;
+  color: black;
+}
+QLineEdit{
+  border-radius: 3px;
+  background-color: #EDB;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  color: black;
+  padding: 5px;
+}
+QPushButton{
+  background-color: #EDB;
+  color: black;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  padding: 5px;
+}
+QPushButton:hover{
+  background-color: white;
+  color: black;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  padding: 5px;
 }
