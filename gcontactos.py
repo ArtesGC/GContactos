@@ -1,9 +1,6 @@
 import re
 from sys import argv, exit
-from typing import Tuple
-
 from PyQt5.Qt import *
-
 from gcdatabase import GCdb
 from gcindicativos import GCI
 
@@ -14,10 +11,10 @@ class GContactos:
     def __init__(self):
         self.gc = QApplication(argv)
         self.ferramentas = QWidget()
-        self.ferramentas.setFixedSize(600, 600)
-        self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
-        self.ferramentas.setWindowTitle('GContactos')
         self.ferramentas.setStyleSheet(theme)
+        self.ferramentas.setFixedSize(600, 600)
+        self.ferramentas.setWindowTitle('GContactos')
+        self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
 
         menu = QToolBar(self.ferramentas)
 
@@ -32,20 +29,20 @@ class GContactos:
         sobre.triggered.connect(self._sobre)
 
         self.tab = QTabWidget(self.ferramentas)
-        self.tab.setGeometry(0, 40, 600, 570)
         self.tab.setMovable(True)
-        self.tab.setTabBarAutoHide(True)
         self.tab.setTabsClosable(True)
+        self.tab.setTabBarAutoHide(True)
+        self.tab.setGeometry(0, 40, 600, 570)
         self.tab.tabCloseRequested.connect(self._fecharTab)
 
         self.nome = None
+        self.email = None
         self.numero = None
         self.endereco = None
-        self.email = None
         self.indicativo = None
+        self.janelaLerContacto = None
         self.janelaNovoContacto = None
         self.janelaEditarContacto = None
-        self.janelaLerContacto = None
 
         self.principal()
 
@@ -202,10 +199,10 @@ Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
 
     def _fecharTab(self):
-        if self.tab.currentIndex() == 0:
-            pass
-        else:
+        if self.tab.currentIndex() >= 1:
             self.tab.removeTab(self.tab.currentIndex())
+        else:
+            pass
 
 
 if __name__ == '__main__':
