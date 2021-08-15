@@ -16,24 +16,28 @@ class GContactos:
         self.ferramentas.setWindowTitle('GContactos')
         self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
 
-        menu = QToolBar(self.ferramentas)
+        menu = QMenuBar(self.ferramentas)
+        opcoes = menu.addMenu("Opcoes")
 
-        _sair = lambda: exit(0)
-        sair = menu.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
-        sair.triggered.connect(_sair)
+        home = opcoes.addAction(QIcon("img/icons/notebook.png"), 'Contactos')
+        home.triggered.connect(self._principal)
 
-        novo = menu.addAction(QIcon('img/icons/newcontact.png'), 'Novo Contacto')
+        novo = opcoes.addAction(QIcon('img/icons/newcontact.png'), 'Novo Contacto')
         novo.triggered.connect(self._novo)
 
-        sobre = menu.addAction(QIcon("img/icons/about.png"), 'Sobre')
+        _sair = lambda: exit(0)
+        sair = opcoes.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
+        sair.triggered.connect(_sair)
+
+        menu.addSeparator()
+
+        sobre = menu.addAction('Sobre')
         sobre.triggered.connect(self._sobre)
 
         self.tab = QTabWidget(self.ferramentas)
         self.tab.setMovable(True)
-        self.tab.setTabsClosable(True)
         self.tab.setTabBarAutoHide(True)
         self.tab.setGeometry(0, 40, 600, 570)
-        self.tab.tabCloseRequested.connect(self._fecharTab)
 
         self.nome = None
         self.email = None
@@ -43,15 +47,20 @@ class GContactos:
         self.janelaLerContacto = None
         self.janelaNovoContacto = None
         self.janelaEditarContacto = None
+        self.janelaListaContactos = None
 
-        self.principal()
+    def _principal(self):
+        if not self.janelaListaContactos:
+            return self.principal()
+        else:
+            self.tab.setCurrentWidget(self.janelaListaContactos)
 
     def principal(self):
         def atualizar():
             self.tab.removeTab(self.tab.currentIndex())
             return self.principal()
 
-        janela1 = QScrollArea()
+        self.janelaListaContactos = QScrollArea()
         layout = QFormLayout()
         layout.setSpacing(20)
 
@@ -62,9 +71,9 @@ class GContactos:
         updtBtn.clicked.connect(atualizar)
         layout.addWidget(updtBtn)
 
-        janela1.setLayout(layout)
-        self.tab.addTab(janela1, 'Contactos')
-        self.tab.setCurrentWidget(janela1)
+        self.janelaListaContactos.setLayout(layout)
+        self.tab.addTab(self.janelaListaContactos, 'Contactos')
+        self.tab.setCurrentWidget(self.janelaListaContactos)
 
     def _editar(self):
         if not self.janelaEditarContacto:
@@ -205,6 +214,7 @@ class GContactos:
 
         self.numero = QLineEdit()
         self.numero.setText(f'+{self.indicativo}')
+        self.numero.setMaxLength(19)
         self.numero.setToolTip('Obrigatório')
         layout.addRow(comboPaises, self.numero)
 
@@ -227,12 +237,6 @@ Nome: GContactos
 Versão: 0.7-082021
 Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
-
-    def _fecharTab(self):
-        if self.tab.currentIndex() >= 1:
-            self.tab.removeTab(self.tab.currentIndex())
-        else:
-            pass
 
 
 if __name__ == '__main__':
