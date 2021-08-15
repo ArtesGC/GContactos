@@ -92,8 +92,6 @@ class GContactos:
     def labelContacto(self, _contacto):
         frame = QFrame()
         frame.setStyleSheet("border-radius: 3px;"
-                            "border-width: 2px;"
-                            "border-color: black;"
                             "background-color: brown;"
                             "color: white;")
 
@@ -108,7 +106,39 @@ class GContactos:
         layout.addRow(visualizador)
 
         edtBtn = QPushButton('Editar Contacto')
+        edtBtn.setStyleSheet("QPushButton{"
+                             "background-color: #EDB;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-style: solid;"
+                             "border-color: black;"
+                             "padding: 5px;}"
+                             "QPushButton:hover{"
+                             "background-color: white;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-color: black;"
+                             "border-style: solid;"
+                             "padding: 5px;}")
         delBtn = QPushButton('Apagar Contacto')
+        delBtn.setStyleSheet("QPushButton{"
+                             "background-color: #EDB;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-style: solid;"
+                             "border-color: black;"
+                             "padding: 5px;}"
+                             "QPushButton:hover{"
+                             "background-color: white;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-color: black;"
+                             "border-style: solid;"
+                             "padding: 5px;}")
         layout.addRow(edtBtn, delBtn)
 
         frame.setLayout(layout)
