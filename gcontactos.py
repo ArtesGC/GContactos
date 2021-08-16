@@ -19,7 +19,7 @@ class GContactos:
         menu = QMenuBar(self.ferramentas)
         opcoes = menu.addMenu("Opções")
 
-        home = opcoes.addAction(QIcon("img/icons/notebook.png"), 'Contactos')
+        home = opcoes.addAction(QIcon("img/icons/notebook.png"), 'Lista Contactos')
         home.triggered.connect(self._principal)
 
         opcoes.addSeparator()
@@ -39,15 +39,14 @@ class GContactos:
         self.tab = QTabWidget(self.ferramentas)
         self.tab.setMovable(True)
         self.tab.setTabBarAutoHide(True)
+        self.tab.setDocumentMode(True)
         self.tab.setGeometry(0, 40, 600, 570)
-        self.tab.tabBarDoubleClicked.connect(self._fecharTab)
 
         self.nome = None
         self.email = None
         self.numero = None
-        self.endereco = None
+        self.morada = None
         self.indicativo = None
-        self.janelaLerContacto = None
         self.janelaNovoContacto = None
         self.janelaEditarContacto = None
         self.janelaListaContactos = None
@@ -57,54 +56,140 @@ class GContactos:
     def _principal(self):
         if not self.janelaListaContactos:
             return self.principal()
+        elif self.janelaListaContactos.isHidden():
+            self.janelaListaContactos.setHidden(False)
+            self.tab.addTab(self.janelaListaContactos, 'Contactos')
+            self.tab.setCurrentWidget(self.janelaListaContactos)
         else:
             self.tab.setCurrentWidget(self.janelaListaContactos)
 
-    def principal(self):
-        def atualizar():
-            self.tab.removeTab(self.tab.currentIndex())
-            return self.principal()
+    def atualizarListaContactos(self):
+        self.tab.removeTab(self.tab.currentIndex())
+        return self.principal()
 
+    def principal(self):
         self.janelaListaContactos = QScrollArea()
         layout = QFormLayout()
-        layout.setSpacing(20)
+        layout.setSpacing(10)
+
+        introLabel = QLabel('<h2>Lista de Contactos</h2>')
+        introLabel.setAlignment(Qt.AlignCenter)
+        layout.addRow(introLabel)
 
         for contacto in GCdb().retornarDados():
             layout.addRow(self.labelContacto(contacto))
 
         updtBtn = QPushButton('Atualizar')
-        updtBtn.clicked.connect(atualizar)
-        layout.addWidget(updtBtn)
+        updtBtn.clicked.connect(self.atualizarListaContactos)
+        layout.addRow(updtBtn)
 
         self.janelaListaContactos.setLayout(layout)
         self.tab.addTab(self.janelaListaContactos, 'Contactos')
         self.tab.setCurrentWidget(self.janelaListaContactos)
 
-    def _editar(self):
+    def _editar(self, nome=None):
         if not self.janelaEditarContacto:
-            return self.editar()
+            return self.editar(nome)
+        elif self.janelaEditarContacto.isHidden():
+            self.janelaEditarContacto.setHidden(False)
+            return self.editar(nome)
         else:
-            return self.tab.setCurrentWidget(self.janelaEditarContacto)
+            self.tab.setCurrentWidget(self.janelaEditarContacto)
 
-    def editar(self):
-        pass
+    def editar(self, nome=None):
+        def _fecharTab():
+            self.tab.removeTab(self.tab.currentIndex())
+            self.atualizarListaContactos()
 
-    def _ler(self):
-        if not self.janelaLerContacto:
-            return self.ler()
-        else:
-            return self.tab.setCurrentWidget(self.janelaLerContacto)
+        def atualizarIndicativo():
+            self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
+            self.numero.setText(f'(+{self.indicativo}){contacto[2]}')
 
-    def ler(self):
-        self.janelaLerContacto = QFrame()
-        layout = QVBoxLayout()
+        def salvar():
+            if (self.nome.text() or self.numero.text()) == '':
+                QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Dados Obrigatórios Não Preenchidos..')
+            elif not validarEmail(self.email.text()):
+                QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Endereço de Email inválido..')
+            else:
+                _id = contacto[0]
+                _nome = self.nome.text()
+                _email = self.email.text()
+                _numero = self.numero.text()
+                _morada = self.morada.text()
+                try:
+                    GCdb().atualizarDados(_id, _nome, _numero, _email, _morada)
+                    QMessageBox.information(self.ferramentas, 'Concluido', 'Contacto Salvo com Sucesso..')
+                    self.tab.removeTab(self.tab.currentIndex())
+                except Exception as erro:
+                    QMessageBox.critical(self.ferramentas, 'Falha', f'Ocorreu o Seguinte Erro Enquanto Processava a Operação: '
+                                                                    f'\n- {erro}')
 
-        self.janelaLerContacto.setLayout(layout)
-        self.tab.addTab(self.janelaLerContacto, 'Ler Contacto')
-        self.tab.setCurrentWidget(self.janelaLerContacto)
+        self.janelaEditarContacto = QFrame()
+        layout = QFormLayout()
+        layout.setSpacing(10)
+
+        iconLabel = QLabel()
+        iconLabel.setPixmap(QPixmap('img/icons/edit.png'))
+        iconLabel.setAlignment(Qt.AlignRight)
+        layout.addRow(iconLabel)
+
+        introLabel = QLabel('<h2>Editar Contacto</h2>')
+        introLabel.setAlignment(Qt.AlignCenter)
+        layout.addRow(introLabel)
+
+        contacto = GCdb().retornarDados(nome)[0]
+
+        self.nome = QLineEdit()
+        self.nome.setPlaceholderText('Digite aqui o nome..')
+        self.nome.setText(contacto[1])
+        self.nome.setToolTip('Obrigatório')
+        layout.addRow(self.nome)
+
+        paises = GCI().paises()
+        comboPaises = QComboBox()
+        comboPaises.addItems(paises)
+        self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
+        comboPaises.currentTextChanged.connect(atualizarIndicativo)
+
+        self.numero = QLineEdit()
+        self.numero.setMaxLength(19)
+        self.numero.setToolTip('Obrigatório')
+        self.numero.setText(contacto[2])
+        layout.addRow(comboPaises, self.numero)
+
+        self.email = QLineEdit()
+        self.email.setPlaceholderText('Digite aqui o email..')
+        self.email.setText(contacto[3])
+        layout.addRow(self.email)
+
+        self.morada = QLineEdit()
+        self.morada.setPlaceholderText('Digite aqui a morada..')
+        self.morada.setMaxLength(119)
+        self.morada.setText(contacto[4])
+        layout.addRow(self.morada)
+
+        btnSalvar = QPushButton('Salvar')
+        btnSalvar.clicked.connect(salvar)
+        layout.addWidget(btnSalvar)
+
+        self.janelaEditarContacto.setLayout(layout)
+        self.tab.addTab(self.janelaEditarContacto, 'Editar Contacto')
+        self.tab.setCurrentWidget(self.janelaEditarContacto)
         self.tab.setTabToolTip(self.tab.currentIndex(), 'Dica: clique duas vezes para fechar a aba!')
+        self.tab.tabBarDoubleClicked.connect(_fecharTab)
 
     def labelContacto(self, _contacto):
+        def editar():
+            self._editar(_contacto[1])
+
+        def apagar():
+            try:
+                GCdb().apagarDado(_contacto[0])
+                QMessageBox.information(self.ferramentas, 'Concluido', 'Operação bem-sucedida..')
+                self.atualizarListaContactos()
+            except Exception as erro:
+                QMessageBox.warning(self.ferramentas, 'Aviso', f'Ocorreu o seguinte erro ao apagar o contacto:\n- {erro}')
+
         frame = QFrame()
         frame.setStyleSheet("border-radius: 3px;"
                             "background-color: brown;"
@@ -137,6 +222,7 @@ class GContactos:
                              "border-color: black;"
                              "border-style: solid;"
                              "padding: 5px;}")
+        edtBtn.clicked.connect(editar)
         delBtn = QPushButton('Apagar Contacto')
         delBtn.setStyleSheet("QPushButton{"
                              "background-color: #EDB;"
@@ -154,6 +240,7 @@ class GContactos:
                              "border-color: black;"
                              "border-style: solid;"
                              "padding: 5px;}")
+        delBtn.clicked.connect(apagar)
         layout.addRow(edtBtn, delBtn)
 
         frame.setLayout(layout)
@@ -162,10 +249,18 @@ class GContactos:
     def _novo(self):
         if not self.janelaNovoContacto:
             return self.novo()
+        elif self.janelaNovoContacto.isHidden():
+            self.janelaNovoContacto.setHidden(False)
+            self.tab.addTab(self.janelaNovoContacto, 'Novo Contacto')
+            self.tab.setCurrentWidget(self.janelaNovoContacto)
         else:
             self.tab.setCurrentWidget(self.janelaNovoContacto)
 
     def novo(self):
+        def _fecharTab():
+            self.tab.removeTab(self.tab.currentIndex())
+            self.atualizarListaContactos()
+
         def atualizarIndicativo():
             self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
             self.numero.setText(f'+{self.indicativo}')
@@ -185,7 +280,7 @@ class GContactos:
                 nome = self.nome.text()
                 email = self.email.text()
                 numero = self.numero.text()
-                morada = self.endereco.text()
+                morada = self.morada.text()
                 try:
                     GCdb().adicionarDados(nome, numero, email, morada)
                     QMessageBox.information(self.ferramentas, 'Concluido', 'Contacto Salvo com Sucesso..')
@@ -196,21 +291,21 @@ class GContactos:
 
         self.janelaNovoContacto = QFrame()
         layout = QFormLayout()
-        layout.setSpacing(20)
+        layout.setSpacing(10)
 
         iconLabel = QLabel()
         iconLabel.setPixmap(QPixmap('img/icons/user.png'))
         iconLabel.setAlignment(Qt.AlignRight)
         layout.addRow(iconLabel)
 
+        introLabel = QLabel('<h2>Novo Contacto</h2>')
+        introLabel.setAlignment(Qt.AlignCenter)
+        layout.addRow(introLabel)
+
         self.nome = QLineEdit()
         self.nome.setPlaceholderText('Digite aqui o nome..')
         self.nome.setToolTip('Obrigatório')
         layout.addRow(self.nome)
-
-        self.email = QLineEdit()
-        self.email.setPlaceholderText('Digite aqui o email..')
-        layout.addRow(self.email)
 
         paises = GCI().paises()
         comboPaises = QComboBox()
@@ -224,10 +319,14 @@ class GContactos:
         self.numero.setToolTip('Obrigatório')
         layout.addRow(comboPaises, self.numero)
 
-        self.endereco = QLineEdit()
-        self.endereco.setPlaceholderText('Digite aqui a morada..')
-        self.endereco.setMaxLength(119)
-        layout.addRow(self.endereco)
+        self.email = QLineEdit()
+        self.email.setPlaceholderText('Digite aqui o email..')
+        layout.addRow(self.email)
+
+        self.morada = QLineEdit()
+        self.morada.setPlaceholderText('Digite aqui a morada, separada por virgulas..')
+        self.morada.setMaxLength(119)
+        layout.addRow(self.morada)
 
         btnSalvar = QPushButton('Salvar')
         btnSalvar.clicked.connect(salvar)
@@ -237,6 +336,7 @@ class GContactos:
         self.tab.addTab(self.janelaNovoContacto, 'Novo Contacto')
         self.tab.setCurrentWidget(self.janelaNovoContacto)
         self.tab.setTabToolTip(self.tab.currentIndex(), 'Dica: clique duas vezes para fechar a aba!')
+        self.tab.tabBarDoubleClicked.connect(_fecharTab)
 
     def _sobre(self):
         QMessageBox.information(self.ferramentas, 'Sobre o Programa', f"""
@@ -244,12 +344,6 @@ Nome: GContactos
 Versão: 0.7-082021
 Designer e Programador: Nurul GC
 Empresa: ArtesGC Inc.""")
-
-    def _fecharTab(self):
-        if self.tab.currentIndex() == 0:
-            pass
-        else:
-            self.tab.removeTab(self.tab.currentIndex())
 
 
 if __name__ == '__main__':
