@@ -1,10 +1,11 @@
-QWidgets, QFrame, QScrollArea{
-  background-color: antiquewhite;
+QWidget, QScrollArea{
+  font-family: "Laila";
+  background-color: "#EDB";
   color: black;
 }
 QLineEdit{
   border-radius: 3px;
-  background-color: #EDB;
+  background-color: "#EDB";
   border-width: 1px;
   border-color: black;
   border-style: solid;
@@ -12,7 +13,7 @@ QLineEdit{
   padding: 5px;
 }
 QPushButton{
-  background-color: #EDB;
+  background-color: "#EDB";
   color: black;
   border-radius: 5px;
   border-width: 1px;
@@ -28,4 +29,12 @@ QPushButton:hover{
   border-color: black;
   border-style: solid;
   padding: 5px;
+}
+QMenuBar::item:selected {
+  background-color: white;
+  color: black;
+}
+QMenu::item:selected{
+  background-color: white;
+  color: black;
 }
