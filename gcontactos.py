@@ -18,12 +18,12 @@ class GContactos:
         self.ferramentas.setStyleSheet(theme)
         self.ferramentas.setFixedSize(600, 600)
         self.ferramentas.setWindowTitle('GContactos')
-        self.ferramentas.setWindowIcon(QIcon("img/artesgc.png"))
+        self.ferramentas.setWindowIcon(QIcon("img/favicons/favicon-192x192.png"))
 
         menu = QMenuBar(self.ferramentas)
         opcoes = menu.addMenu("Opções")
 
-        home = opcoes.addAction(QIcon("img/icons/notebook.png"), 'Lista Contactos')
+        home = opcoes.addAction(QIcon("img/icons/contacts.png"), 'Lista Contactos')
         home.triggered.connect(self._principal)
 
         opcoes.addSeparator()
@@ -34,7 +34,7 @@ class GContactos:
         opcoes.addSeparator()
 
         _sair = lambda: exit(0)
-        sair = opcoes.addAction(QIcon("img/icons/rempage.png"), 'Fechar')
+        sair = opcoes.addAction(QIcon("img/icons/exit.png"), 'Fechar')
         sair.triggered.connect(_sair)
 
         sobre = menu.addAction('Sobre')
@@ -148,8 +148,7 @@ class GContactos:
 
     def principal(self):
         self.janelaListaContactos = QScrollArea()
-        self.janelaListaContactos.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.janelaListaContactos.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.janelaListaContactos.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.janelaListaContactos.setWidgetResizable(True)
 
         layout = QVBoxLayout()
@@ -189,10 +188,6 @@ class GContactos:
             self.tab.removeTab(self.tab.currentIndex())
             self.atualizarListaContactos()
 
-        def atualizarIndicativo():
-            self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
-            self.numero.setText(f'(+{self.indicativo}){contacto[2]}')
-
         def salvar():
             if (self.nome.text() or self.numero.text()) == '':
                 QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Dados Obrigatórios Não Preenchidos..')
@@ -224,26 +219,21 @@ class GContactos:
         introLabel = QLabel('<h2>Editar Contacto</h2>')
         introLabel.setAlignment(Qt.AlignCenter)
         layout.addRow(introLabel)
+        layout.addRow(QLabel('<hr>'))
 
         contacto = GCdb().retornarDados(nome)[0]
 
         self.nome = QLineEdit()
         self.nome.setPlaceholderText('Digite aqui o nome..')
         self.nome.setText(contacto[1])
-        self.nome.setToolTip('Obrigatório')
-        layout.addRow(self.nome)
-
-        paises = GCI().paises()
-        comboPaises = QComboBox()
-        comboPaises.addItems(paises)
-        self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
-        comboPaises.currentTextChanged.connect(atualizarIndicativo)
+        self.nome.setToolTip('Obrigatório!')
+        layout.addRow("Obrigatório *", self.nome)
 
         self.numero = QLineEdit()
         self.numero.setMaxLength(19)
-        self.numero.setToolTip('Obrigatório')
+        self.numero.setToolTip('Obrigatório!')
         self.numero.setText(contacto[2])
-        layout.addRow(comboPaises, self.numero)
+        layout.addRow("Obrigatório *", self.numero)
 
         self.email = QLineEdit()
         self.email.setPlaceholderText('Digite aqui o email..')
@@ -321,11 +311,12 @@ class GContactos:
         introLabel = QLabel('<h2>Novo Contacto</h2>')
         introLabel.setAlignment(Qt.AlignCenter)
         layout.addRow(introLabel)
+        layout.addRow(QLabel('<hr>'))
 
         self.nome = QLineEdit()
         self.nome.setPlaceholderText('Digite aqui o nome..')
-        self.nome.setToolTip('Obrigatório')
-        layout.addRow(self.nome)
+        self.nome.setToolTip('Obrigatório!')
+        layout.addRow("Obrigatório *", self.nome)
 
         paises = GCI().paises()
         comboPaises = QComboBox()
@@ -336,8 +327,9 @@ class GContactos:
         self.numero = QLineEdit()
         self.numero.setText(f'+{self.indicativo}')
         self.numero.setMaxLength(19)
-        self.numero.setToolTip('Obrigatório')
-        layout.addRow(comboPaises, self.numero)
+        self.numero.setToolTip('Obrigatório!')
+        layout.addRow("Obrigatório *", comboPaises)
+        layout.addWidget(self.numero)
 
         self.email = QLineEdit()
         self.email.setPlaceholderText('Digite aqui o email..')
