@@ -57,6 +57,85 @@ class GContactos:
 
         self.principal()
 
+    def atualizarListaContactos(self):
+        self.tab.removeTab(self.tab.currentIndex())
+        return self.principal()
+
+    def labelContacto(self, _contacto):
+        def editar():
+            self._editar(_contacto[1])
+
+        def apagar():
+            try:
+                GCdb().apagarDado(_nome=_contacto[1])
+                QMessageBox.information(self.ferramentas, 'Concluido', 'Operação bem-sucedida..')
+                self.atualizarListaContactos()
+            except Exception as erro:
+                QMessageBox.warning(self.ferramentas, 'Aviso', f'Ocorreu o seguinte erro ao apagar o contacto:\n- {erro}')
+
+        frame = QFrame()
+        frame.setStyleSheet("QFrame{border-radius: 5px;"
+                            "background-color: brown;"
+                            "color: #EDB;"
+                            "height: 200px}")
+
+        layout = QFormLayout()
+        layout.setSpacing(10)
+
+        visualizador = QLabel()
+        visualizador.setText(f"<b>Nome</b>: {_contacto[1]}<br>"
+                             f"<b>Numero</b>: {_contacto[2]}<br>"
+                             f"<b>Email</b>: {_contacto[3]}<br>"
+                             f"<b>Morada</b>: {_contacto[4]}")
+        iconVisualizador = QLabel()
+        iconVisualizador.setPixmap(QPixmap('img/icons/user.png'))
+        iconVisualizador.setStyleSheet("QLabel{background-color: #EDB;}")
+        layout.addRow(iconVisualizador, visualizador)
+
+        layoutBtns = QHBoxLayout()
+        edtBtn = QPushButton(QIcon('img/icons/edit.png'), 'Editar Contacto')
+        edtBtn.setStyleSheet("QPushButton{"
+                             "background-color: #EDB;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-style: solid;"
+                             "border-color: black;"
+                             "padding: 5px;}"
+                             "QPushButton:hover{"
+                             "background-color: white;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-color: black;"
+                             "border-style: solid;"
+                             "padding: 5px;}")
+        edtBtn.clicked.connect(editar)
+        layoutBtns.addWidget(edtBtn)
+        delBtn = QPushButton(QIcon('img/icons/delete.png'), 'Apagar Contacto')
+        delBtn.setStyleSheet("QPushButton{"
+                             "background-color: #EDB;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-style: solid;"
+                             "border-color: black;"
+                             "padding: 5px;}"
+                             "QPushButton:hover{"
+                             "background-color: white;"
+                             "color: black;"
+                             "border-radius: 5px;"
+                             "border-width: 1px;"
+                             "border-color: black;"
+                             "border-style: solid;"
+                             "padding: 5px;}")
+        delBtn.clicked.connect(apagar)
+        layoutBtns.addWidget(delBtn)
+        layout.addRow(layoutBtns)
+
+        frame.setLayout(layout)
+        return frame
+
     def _principal(self):
         if not self.janelaListaContactos:
             return self.principal()
@@ -67,10 +146,6 @@ class GContactos:
         else:
             self.tab.setCurrentWidget(self.janelaListaContactos)
 
-    def atualizarListaContactos(self):
-        self.tab.removeTab(self.tab.currentIndex())
-        return self.principal()
-
     def principal(self):
         self.janelaListaContactos = QScrollArea()
         self.janelaListaContactos.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -78,7 +153,6 @@ class GContactos:
         self.janelaListaContactos.setWidgetResizable(True)
 
         layout = QVBoxLayout()
-        layout.setGeometry(QRect(0, 0, 500, 500))
         layout.setSpacing(10)
 
         iconLabel = QLabel()
@@ -191,81 +265,6 @@ class GContactos:
         self.tab.setCurrentWidget(self.janelaEditarContacto)
         self.tab.setTabToolTip(self.tab.currentIndex(), 'Dica: clique duas vezes para fechar a aba!')
         self.tab.tabBarDoubleClicked.connect(_fecharTab)
-
-    def labelContacto(self, _contacto):
-        def editar():
-            self._editar(_contacto[1])
-
-        def apagar():
-            try:
-                GCdb().apagarDado(_nome=_contacto[1])
-                QMessageBox.information(self.ferramentas, 'Concluido', 'Operação bem-sucedida..')
-                self.atualizarListaContactos()
-            except Exception as erro:
-                QMessageBox.warning(self.ferramentas, 'Aviso', f'Ocorreu o seguinte erro ao apagar o contacto:\n- {erro}')
-
-        frame = QFrame()
-        frame.setStyleSheet("QFrame{border-radius: 5px;"
-                            "background-color: brown;"
-                            "color: #EDB;"
-                            "height: 200px}")
-
-        layout = QFormLayout()
-        layout.setSpacing(10)
-
-        visualizador = QLabel()
-        visualizador.setText(f"<b>Nome</b>: {_contacto[1]}<br>"
-                             f"<b>Numero</b>: {_contacto[2]}<br>"
-                             f"<b>Email</b>: {_contacto[3]}<br>"
-                             f"<b>Morada</b>: {_contacto[4]}")
-        iconVisualizador = QLabel()
-        iconVisualizador.setPixmap(QPixmap('img/icons/user.png'))
-        iconVisualizador.setStyleSheet("QLabel{background-color: #EDB;}")
-        layout.addRow(iconVisualizador, visualizador)
-
-        layoutBtns = QHBoxLayout()
-        edtBtn = QPushButton(QIcon('img/icons/edit.png'), 'Editar Contacto')
-        edtBtn.setStyleSheet("QPushButton{"
-                             "background-color: #EDB;"
-                             "color: black;"
-                             "border-radius: 5px;"
-                             "border-width: 1px;"
-                             "border-style: solid;"
-                             "border-color: black;"
-                             "padding: 5px;}"
-                             "QPushButton:hover{"
-                             "background-color: white;"
-                             "color: black;"
-                             "border-radius: 5px;"
-                             "border-width: 1px;"
-                             "border-color: black;"
-                             "border-style: solid;"
-                             "padding: 5px;}")
-        edtBtn.clicked.connect(editar)
-        layoutBtns.addWidget(edtBtn)
-        delBtn = QPushButton(QIcon('img/icons/delete.png'), 'Apagar Contacto')
-        delBtn.setStyleSheet("QPushButton{"
-                             "background-color: #EDB;"
-                             "color: black;"
-                             "border-radius: 5px;"
-                             "border-width: 1px;"
-                             "border-style: solid;"
-                             "border-color: black;"
-                             "padding: 5px;}"
-                             "QPushButton:hover{"
-                             "background-color: white;"
-                             "color: black;"
-                             "border-radius: 5px;"
-                             "border-width: 1px;"
-                             "border-color: black;"
-                             "border-style: solid;"
-                             "padding: 5px;}")
-        delBtn.clicked.connect(apagar)
-        layoutBtns.addWidget(delBtn)
-        layout.addRow(layoutBtns)
-
-        frame.setLayout(layout)
-        return frame
 
     def _novo(self):
         if not self.janelaNovoContacto:
