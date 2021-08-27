@@ -162,9 +162,12 @@ class GContactos:
         introLabel = QLabel('<h2>Lista de Contactos</h2>')
         introLabel.setAlignment(Qt.AlignCenter)
         layout.addWidget(introLabel)
+        layout.addWidget(QLabel('<hr>'))
 
         for contacto in GCdb().retornarDados():
             layout.addWidget(self.labelContacto(contacto))
+        else:
+            layout.addWidget(QLabel('<h3><i>Ainda Sem Contactos Gravados..</i></h3>'), alignment=Qt.AlignCenter)
 
         updtBtn = QPushButton('Atualizar')
         updtBtn.clicked.connect(self.atualizarListaContactos)
@@ -188,6 +191,12 @@ class GContactos:
             self.tab.removeTab(self.tab.currentIndex())
             self.atualizarListaContactos()
 
+        def validarEmail(_email):
+            validador = re.compile(r'^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}')
+            if validador.match(_email):
+                return True
+            return False
+
         def salvar():
             if (self.nome.text() or self.numero.text()) == '':
                 QMessageBox.warning(self.ferramentas, 'Atenção', 'Contacto Não Guardado\n- Dados Obrigatórios Não Preenchidos..')
@@ -202,7 +211,7 @@ class GContactos:
                 try:
                     GCdb().atualizarDados(_id, _nome, _numero, _email, _morada)
                     QMessageBox.information(self.ferramentas, 'Concluido', 'Contacto Salvo com Sucesso..')
-                    self.tab.removeTab(self.tab.currentIndex())
+                    self.atualizarListaContactos()
                 except Exception as erro:
                     QMessageBox.critical(self.ferramentas, 'Falha', f'Ocorreu o Seguinte Erro Enquanto Processava a Operação: '
                                                                     f'\n- {erro}')
@@ -227,13 +236,13 @@ class GContactos:
         self.nome.setPlaceholderText('Digite aqui o nome..')
         self.nome.setText(contacto[1])
         self.nome.setToolTip('Obrigatório!')
-        layout.addRow("Obrigatório *", self.nome)
+        layout.addRow("Obrigatorio *", self.nome)
 
         self.numero = QLineEdit()
         self.numero.setMaxLength(19)
         self.numero.setToolTip('Obrigatório!')
         self.numero.setText(contacto[2])
-        layout.addRow("Obrigatório *", self.numero)
+        layout.addRow("Obrigatorio *", self.numero)
 
         self.email = QLineEdit()
         self.email.setPlaceholderText('Digite aqui o email..')
@@ -316,7 +325,7 @@ class GContactos:
         self.nome = QLineEdit()
         self.nome.setPlaceholderText('Digite aqui o nome..')
         self.nome.setToolTip('Obrigatório!')
-        layout.addRow("Obrigatório *", self.nome)
+        layout.addRow("Obrigatorio *", self.nome)
 
         paises = GCI().paises()
         comboPaises = QComboBox()
@@ -328,7 +337,7 @@ class GContactos:
         self.numero.setText(f'+{self.indicativo}')
         self.numero.setMaxLength(19)
         self.numero.setToolTip('Obrigatório!')
-        layout.addRow("Obrigatório *", comboPaises)
+        layout.addRow("Obrigatorio *", comboPaises)
         layout.addWidget(self.numero)
 
         self.email = QLineEdit()
