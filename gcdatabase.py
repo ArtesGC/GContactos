@@ -23,14 +23,11 @@ class GCdb:
             db = False
         return db
 
-    def apagarDado(self, _id=None):
+    def apagarDado(self, _nome):
         db = self.conectarDb()
         try:
             executor = db.cursor()
-            if not _id:
-                resultado = executor.execute("DELETE FROM gcontactos")
-            else:
-                resultado = executor.execute("DELETE FROM gcontactos WHERE id=?", (id,))
+            resultado = executor.execute("DELETE FROM gcontactos WHERE nome=?", (_nome,))
             if resultado:
                 db.commit()
                 db.close()
