@@ -10,6 +10,10 @@ theme = open('themes/gcontactos.qss').read().strip()
 class GContactos:
     def __init__(self):
         self.gc = QApplication(argv)
+
+        self.fonteDB = QFontDatabase()
+        self.fonteDB.addApplicationFont('fonts/laila.ttf')
+
         self.ferramentas = QWidget()
         self.ferramentas.setStyleSheet(theme)
         self.ferramentas.setFixedSize(600, 600)
@@ -40,7 +44,7 @@ class GContactos:
         self.tab.setMovable(True)
         self.tab.setTabBarAutoHide(True)
         self.tab.setDocumentMode(True)
-        self.tab.setGeometry(0, 40, 600, 570)
+        self.tab.setGeometry(0, 40, 600, 560)
 
         self.nome = None
         self.email = None
@@ -69,19 +73,29 @@ class GContactos:
 
     def principal(self):
         self.janelaListaContactos = QScrollArea()
-        layout = QFormLayout()
+        self.janelaListaContactos.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.janelaListaContactos.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.janelaListaContactos.setWidgetResizable(True)
+
+        layout = QVBoxLayout()
+        layout.setGeometry(QRect(0, 0, 500, 500))
         layout.setSpacing(10)
+
+        iconLabel = QLabel()
+        iconLabel.setPixmap(QPixmap('img/icons/contacts.png'))
+        iconLabel.setAlignment(Qt.AlignRight)
+        layout.addWidget(iconLabel)
 
         introLabel = QLabel('<h2>Lista de Contactos</h2>')
         introLabel.setAlignment(Qt.AlignCenter)
-        layout.addRow(introLabel)
+        layout.addWidget(introLabel)
 
         for contacto in GCdb().retornarDados():
-            layout.addRow(self.labelContacto(contacto))
+            layout.addWidget(self.labelContacto(contacto))
 
         updtBtn = QPushButton('Atualizar')
         updtBtn.clicked.connect(self.atualizarListaContactos)
-        layout.addRow(updtBtn)
+        layout.addWidget(updtBtn)
 
         self.janelaListaContactos.setLayout(layout)
         self.tab.addTab(self.janelaListaContactos, 'Contactos')
@@ -129,7 +143,7 @@ class GContactos:
         layout.setSpacing(10)
 
         iconLabel = QLabel()
-        iconLabel.setPixmap(QPixmap('img/icons/edit.png'))
+        iconLabel.setPixmap(QPixmap('img/icons/editcontact.png'))
         iconLabel.setAlignment(Qt.AlignRight)
         layout.addRow(iconLabel)
 
@@ -184,16 +198,17 @@ class GContactos:
 
         def apagar():
             try:
-                GCdb().apagarDado(_contacto[0])
+                GCdb().apagarDado(_nome=_contacto[1])
                 QMessageBox.information(self.ferramentas, 'Concluido', 'Operação bem-sucedida..')
                 self.atualizarListaContactos()
             except Exception as erro:
                 QMessageBox.warning(self.ferramentas, 'Aviso', f'Ocorreu o seguinte erro ao apagar o contacto:\n- {erro}')
 
         frame = QFrame()
-        frame.setStyleSheet("border-radius: 3px;"
+        frame.setStyleSheet("QFrame{border-radius: 5px;"
                             "background-color: brown;"
-                            "color: white;")
+                            "color: #EDB;"
+                            "height: 200px}")
 
         layout = QFormLayout()
         layout.setSpacing(10)
@@ -203,9 +218,13 @@ class GContactos:
                              f"<b>Numero</b>: {_contacto[2]}<br>"
                              f"<b>Email</b>: {_contacto[3]}<br>"
                              f"<b>Morada</b>: {_contacto[4]}")
-        layout.addRow(visualizador)
+        iconVisualizador = QLabel()
+        iconVisualizador.setPixmap(QPixmap('img/icons/user.png'))
+        iconVisualizador.setStyleSheet("QLabel{background-color: #EDB;}")
+        layout.addRow(iconVisualizador, visualizador)
 
-        edtBtn = QPushButton('Editar Contacto')
+        layoutBtns = QHBoxLayout()
+        edtBtn = QPushButton(QIcon('img/icons/edit.png'), 'Editar Contacto')
         edtBtn.setStyleSheet("QPushButton{"
                              "background-color: #EDB;"
                              "color: black;"
@@ -223,7 +242,8 @@ class GContactos:
                              "border-style: solid;"
                              "padding: 5px;}")
         edtBtn.clicked.connect(editar)
-        delBtn = QPushButton('Apagar Contacto')
+        layoutBtns.addWidget(edtBtn)
+        delBtn = QPushButton(QIcon('img/icons/delete.png'), 'Apagar Contacto')
         delBtn.setStyleSheet("QPushButton{"
                              "background-color: #EDB;"
                              "color: black;"
@@ -241,7 +261,8 @@ class GContactos:
                              "border-style: solid;"
                              "padding: 5px;}")
         delBtn.clicked.connect(apagar)
-        layout.addRow(edtBtn, delBtn)
+        layoutBtns.addWidget(delBtn)
+        layout.addRow(layoutBtns)
 
         frame.setLayout(layout)
         return frame
@@ -294,7 +315,7 @@ class GContactos:
         layout.setSpacing(10)
 
         iconLabel = QLabel()
-        iconLabel.setPixmap(QPixmap('img/icons/user.png'))
+        iconLabel.setPixmap(QPixmap('img/icons/newcontact.png'))
         iconLabel.setAlignment(Qt.AlignRight)
         layout.addRow(iconLabel)
 
