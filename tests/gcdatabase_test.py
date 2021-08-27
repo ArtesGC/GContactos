@@ -21,7 +21,7 @@ class MyTestCase(unittest.TestCase):
                                               _morada='ao', _email='gc@gmail.com', _id=0))
 
     def test_apagardados(self):
-        self.assertTrue(GCdb().apagarDado(_id=0))
+        self.assertTrue(GCdb().apagarDado(_nome='nurul'))
 
 
 if __name__ == '__main__':
