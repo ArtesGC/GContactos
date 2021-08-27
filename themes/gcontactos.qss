@@ -5,7 +5,7 @@ QWidget, QScrollArea{
 }
 QLineEdit{
   border-radius: 3px;
-  background-color: "#EDB";
+  background-color: "white";
   border-width: 1px;
   border-color: black;
   border-style: solid;
@@ -13,7 +13,7 @@ QLineEdit{
   padding: 5px;
 }
 QPushButton{
-  background-color: "#EDB";
+  background-color: white;
   color: black;
   border-radius: 5px;
   border-width: 1px;
@@ -22,7 +22,7 @@ QPushButton{
   padding: 5px;
 }
 QPushButton:hover{
-  background-color: white;
+  background-color: "#EDB";
   color: black;
   border-radius: 5px;
   border-width: 1px;
