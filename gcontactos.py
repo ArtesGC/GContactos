@@ -147,12 +147,8 @@ class GContactos:
             self.tab.setCurrentWidget(self.janelaListaContactos)
 
     def principal(self):
-        self.janelaListaContactos = QScrollArea()
-        self.janelaListaContactos.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.janelaListaContactos.setWidgetResizable(True)
-
+        self.janelaListaContactos = QFrame()
         layout = QVBoxLayout()
-        layout.setSpacing(10)
 
         iconLabel = QLabel()
         iconLabel.setPixmap(QPixmap('img/icons/contacts.png'))
@@ -164,10 +160,21 @@ class GContactos:
         layout.addWidget(introLabel)
         layout.addWidget(QLabel('<hr>'))
 
+        listaContactos = QScrollArea()
+        listaContactos.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        listaContactos.setWidgetResizable(True)
+        layoutContactos = QVBoxLayout()
+
         for contacto in GCdb().retornarDados():
-            layout.addWidget(self.labelContacto(contacto))
-        else:
-            layout.addWidget(QLabel('<h3><i>Ainda Sem Contactos Gravados..</i></h3>'), alignment=Qt.AlignCenter)
+            if contacto:
+                layoutContactos.addWidget(self.labelContacto(contacto))
+            else:
+                layoutContactos.addWidget(QLabel('<h3><i>Ainda Sem Contactos Gravados..</i></h3>'), alignment=Qt.AlignCenter)
+                for n in range(5):
+                    layoutContactos.addWidget(QLabel('<br>'))
+
+        listaContactos.setLayout(layoutContactos)
+        layout.addWidget(listaContactos)
 
         updtBtn = QPushButton('Atualizar')
         updtBtn.clicked.connect(self.atualizarListaContactos)
