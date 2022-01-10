@@ -11,12 +11,10 @@ class GContactos:
     def __init__(self):
         self.gc = QApplication(argv)
 
-        self.fonteDB = QFontDatabase()
-        self.fonteDB.addApplicationFont('fonts/laila.ttf')
+        QFontDatabase.addApplicationFont('fonts/laila.ttf')
 
         self.ferramentas = QWidget()
         self.ferramentas.setStyleSheet(theme)
-        self.ferramentas.setFixedSize(600, 600)
         self.ferramentas.setWindowTitle('GContactos')
         self.ferramentas.setWindowIcon(QIcon("img/favicons/favicon-192x192.png"))
 
@@ -336,6 +334,7 @@ class GContactos:
 
         paises = GCI().paises()
         comboPaises = QComboBox()
+        comboPaises.setFont(QFont("times", 10))
         comboPaises.addItems(paises)
         self.indicativo = GCI().indicativo_especifico(comboPaises.currentText())
         comboPaises.currentTextChanged.connect(atualizarIndicativo)
