@@ -55,7 +55,7 @@ Empresa: ArtesGC Inc.''')
     
     def editar(self):
         try:
-            if os.path.exists('GContactos'):
+            if path.exists('GContactos'):
                 contacto = askopenfilename(initialdir='GContactos')
                 with open(contacto, 'r+') as f:
                     fc = f.read()
@@ -112,7 +112,7 @@ Email: {self.email.get()}''')
     
     def mostrar(self):
         try:
-            if os.path.exists('GContactos'):
+            if path.exists('GContactos'):
                 contacto = askopenfilename(initialdir='GContactos')
                 with open(contacto, 'r+') as f:
                     fc = f.readlines()
